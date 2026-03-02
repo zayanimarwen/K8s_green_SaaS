@@ -1,0 +1,46 @@
+{
+  "title": "Tenant Metrics",
+  "uid": "green-tenant-metrics",
+  "version": 1,
+  "templating": {
+    "list": [
+      {
+        "name": "tenant_id",
+        "type": "query",
+        "query": "label_values(green_score, tenant_id)"
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Green Score Evolution",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "green_score{tenant_id='$tenant_id'}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Annual Waste \u20ac",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "green_annual_waste_eur{tenant_id='$tenant_id'}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "CO2 kg/year",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "green_co2_kg_annual{tenant_id='$tenant_id'}"
+        }
+      ]
+    }
+  ]
+}

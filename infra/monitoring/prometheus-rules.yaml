@@ -1,0 +1,57 @@
+groups:
+  - name: green-saas-slo
+    interval: 30s
+    rules:
+      # SLO: API disponibilité > 99.9%
+      - alert: APIHighErrorRate
+        expr: sum(rate(http_requests_total{job="green-api",status=~"5.."}[5m])) / sum(rate(http_requests_total{job="green-api"}[5m])) > 0.001
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "API error rate > 0.1% — SLO breach"
+
+      # Worker lag NATS
+      - alert: WorkerNATSLagHigh
+        expr: nats_consumer_num_pending > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "NATS consumer lag > 1000 messages"
+
+      # Agent déconnecté (pas de métriques depuis 5min)
+      - alert: AgentSilent
+        expr: time() - max by (cluster_id) (green_agent_last_collect_timestamp) > 300
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Agent silencieux sur cluster {{ $labels.cluster_id }}"
+
+      # Latence API P99 > 2s
+      - alert: APIHighLatency
+        expr: histogram_quantile(0.99, rate(http_request_duration_seconds_bucket{job="green-api"}[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "API P99 latency > 2s"
+
+  - name: green-infra
+    rules:
+      - alert: PostgresDown
+        expr: up{job="postgres"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PostgreSQL / TimescaleDB down"
+
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis down"

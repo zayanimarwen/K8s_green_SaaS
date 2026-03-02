@@ -1,0 +1,35 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/k8s-green/agent
+  tag: latest
+  pullPolicy: Always
+
+config:
+  clusterId: ""          # OBLIGATOIRE — nom unique du cluster
+  tenantId: ""           # OBLIGATOIRE — ID tenant SaaS
+  collectInterval: "30s"
+  prometheusUrl: "http://prometheus-operated.monitoring:9090"
+  logLevel: "info"
+  includeSystemNs: false
+
+natsUrl: ""              # Fourni via secret, ne pas mettre ici
+signingKey: ""           # Fourni via secret, ne pas mettre ici
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 128Mi
+
+serviceAccount:
+  create: true
+  name: green-agent-sa
+
+# External Secrets Operator
+externalSecrets:
+  enabled: true
+  secretStore: vault-backend
+  refreshInterval: 24h

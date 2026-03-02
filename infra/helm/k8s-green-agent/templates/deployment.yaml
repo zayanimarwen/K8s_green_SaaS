@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "k8s-green-agent.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: k8s-green-agent
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: k8s-green-agent
+  template:
+    metadata:
+      labels:
+        app: k8s-green-agent
+      annotations:
+        kubectl.kubernetes.io/default-container: agent
+    spec:
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: agent
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "k8s-green-agent.fullname" . }}-config
+          env:
+            - name: GREEN_SIGNING_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: green-agent-secrets
+                  key: signing-key
+            - name: GREEN_NATS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: green-agent-secrets
+                  key: nats-url
+          volumeMounts:
+            - name: mtls-certs
+              mountPath: /certs
+              readOnly: true
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: mtls-certs
+          secret:
+            secretName: green-agent-mtls

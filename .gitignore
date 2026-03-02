@@ -1,0 +1,67 @@
+# Binaires
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Go
+vendor/
+*.test
+*.out
+coverage-*.out
+.air/
+
+# Node
+node_modules/
+frontend/dist/
+frontend/.vite/
+*.log
+npm-debug.log*
+
+# Secrets — JAMAIS dans Git
+*.env
+.env*
+.env.local
+.env.*.local
+secrets/
+**/secrets/
+kubeconfig*
+*.pem
+*.key
+*.crt
+*-cert.pem
+vault-token
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+.terraform.lock.hcl
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+__pycache__/
+
+# Docker
+.dockerignore
+
+# Build artifacts
+*.tar.gz
+dist/
+build/
+
+# Test
+coverage/
+*.coverprofile

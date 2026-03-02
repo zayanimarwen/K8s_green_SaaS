@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: green-agent-config
+  namespace: green-system
+data:
+  GREEN_CLUSTER_ID: "my-cluster"
+  GREEN_TENANT_ID: "tenant-macif"
+  GREEN_COLLECT_INTERVAL: "30s"
+  GREEN_PROMETHEUS_URL: "http://prometheus-operated.monitoring:9090"
+  GREEN_LOG_LEVEL: "info"
+  GREEN_TLS_CERT_FILE: "/certs/tls.crt"
+  GREEN_TLS_KEY_FILE: "/certs/tls.key"
+  GREEN_TLS_CA_FILE: "/certs/ca.crt"

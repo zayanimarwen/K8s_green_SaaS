@@ -1,0 +1,34 @@
+{
+  "description": "Bridge SAML PingFederate MACIF \u2192 Keycloak OIDC",
+  "identityProvider": {
+    "providerId": "saml",
+    "alias": "pingfederate-macif",
+    "displayName": "SSO MACIF",
+    "enabled": true,
+    "config": {
+      "entityId": "https://sso.macif.fr/idp",
+      "singleSignOnServiceUrl": "https://sso.macif.fr/idp/SSO.saml2",
+      "nameIDPolicyFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
+      "wantAuthnRequestsSigned": true,
+      "validateSignature": true
+    }
+  },
+  "mappers": [
+    {
+      "name": "email",
+      "identityProviderMapper": "saml-user-attribute-idp-mapper",
+      "config": {
+        "attribute.value": "mail",
+        "user.attribute": "email"
+      }
+    },
+    {
+      "name": "firstName",
+      "identityProviderMapper": "saml-user-attribute-idp-mapper",
+      "config": {
+        "attribute.value": "givenName",
+        "user.attribute": "firstName"
+      }
+    }
+  ]
+}

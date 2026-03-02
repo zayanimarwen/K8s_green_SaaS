@@ -1,0 +1,43 @@
+global:
+  image:
+    registry: ghcr.io/k8s-green
+    tag: latest
+    pullPolicy: Always
+
+api:
+  replicas: 2
+  port: 9000
+  resources:
+    requests: { cpu: 100m, memory: 128Mi }
+    limits:   { cpu: 500m, memory: 512Mi }
+
+worker:
+  replicas: 2
+  resources:
+    requests: { cpu: 100m, memory: 128Mi }
+    limits:   { cpu: 1000m, memory: 1Gi }
+
+frontend:
+  replicas: 2
+  port: 80
+  resources:
+    requests: { cpu: 50m, memory: 64Mi }
+    limits:   { cpu: 200m, memory: 128Mi }
+
+ingress:
+  enabled: true
+  className: nginx
+  host: green.example.com
+  tls: true
+  certManager:
+    issuer: letsencrypt-prod
+
+hpa:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPU: 70
+
+pdb:
+  enabled: true
+  minAvailable: 1

@@ -1,0 +1,18 @@
+{
+  "roles": {
+    "superadmin": {
+      "description": "Acc\u00e8s total plateforme \u2014 gestion tenants"
+    },
+    "admin": {
+      "description": "Admin tenant \u2014 gestion clusters et users"
+    },
+    "viewer": {
+      "description": "Lecture seule \u2014 dashboards et rapports"
+    }
+  },
+  "mappings": {
+    "MACIF_IT_ADMIN": "admin",
+    "MACIF_IT_OPS": "viewer",
+    "GREEN_SUPERADMIN": "superadmin"
+  }
+}

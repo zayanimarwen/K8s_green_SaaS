@@ -1,0 +1,28 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - prometheus-rules.yaml
+
+scrape_configs:
+  - job_name: green-api
+    static_configs:
+      - targets: ['green-api:9000']
+    metrics_path: /metrics
+
+  - job_name: green-worker
+    static_configs:
+      - targets: ['green-worker:9001']
+
+  - job_name: nats
+    static_configs:
+      - targets: ['nats:7777']
+
+  - job_name: kubernetes-pods
+    kubernetes_sd_configs:
+      - role: pod
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        action: keep
+        regex: "true"

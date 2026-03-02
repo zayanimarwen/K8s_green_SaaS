@@ -1,0 +1,8 @@
+apiVersion: v2
+name: k8s-green-agent
+description: Agent K8s Green Optimizer — installé in-cluster chez le client
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords: [kubernetes, green, optimizer, agent]
+home: https://github.com/k8s-green/agent

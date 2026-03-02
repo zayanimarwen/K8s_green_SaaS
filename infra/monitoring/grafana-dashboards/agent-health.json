@@ -1,0 +1,37 @@
+{
+  "title": "Agent Health",
+  "uid": "green-agent-health",
+  "version": 1,
+  "panels": [
+    {
+      "id": 1,
+      "title": "Last Collect (minutes ago)",
+      "type": "table",
+      "targets": [
+        {
+          "expr": "(time() - green_agent_last_collect_timestamp) / 60"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Pods Collected / Agent",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "green_agent_pods_collected"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Agent Errors",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "rate(green_agent_errors_total[5m])"
+        }
+      ]
+    }
+  ]
+}

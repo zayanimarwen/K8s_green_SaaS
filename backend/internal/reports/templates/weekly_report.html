@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>🌿 Green Report — {{.ClusterName}}</title>
+  <style>
+    body { font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 680px; margin: 0 auto; padding: 24px; color: #1a1a2e; }
+    .header { background: linear-gradient(135deg, #16213e, #0f3460); color: white; padding: 32px; border-radius: 12px; margin-bottom: 24px; }
+    .score-ring { font-size: 64px; font-weight: 900; }
+    .grade { font-size: 28px; background: rgba(255,255,255,0.2); display: inline-block; padding: 4px 16px; border-radius: 20px; }
+    .metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0; }
+    .metric { background: #f8fafc; border-radius: 8px; padding: 16px; text-align: center; }
+    .metric-value { font-size: 28px; font-weight: 700; color: #0f3460; }
+    .metric-label { font-size: 12px; color: #64748b; margin-top: 4px; }
+    .reco { padding: 12px 16px; border-left: 4px solid #e2e8f0; margin: 8px 0; background: #f8fafc; border-radius: 0 8px 8px 0; }
+    .HIGH { border-color: #ef4444; } .MEDIUM { border-color: #f59e0b; } .LOW { border-color: #22c55e; }
+    .priority { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+    .priority.HIGH { background: #fee2e2; color: #dc2626; }
+    .priority.MEDIUM { background: #fef3c7; color: #d97706; }
+    .footer { margin-top: 32px; text-align: center; font-size: 12px; color: #94a3b8; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div style="margin-bottom:8px; opacity:0.7; font-size:14px">🌿 K8s Green Optimizer — Rapport hebdomadaire</div>
+    <div style="font-size:20px; font-weight:600; margin-bottom:16px">{{.TenantName}} / {{.ClusterName}}</div>
+    <div class="score-ring">{{printf "%.0f" .Score}}</div>
+    <span class="grade">{{.Grade}}</span>
+    <div style="margin-top:8px; opacity:0.7">Semaine du {{.WeekOf}}</div>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric">
+      <div class="metric-value">{{printf "%.1f" .CO2Kg}}<span style="font-size:16px">kg</span></div>
+      <div class="metric-label">CO₂ évité/an si optimisé</div>
+    </div>
+    <div class="metric">
+      <div class="metric-value">{{printf "%.0f" .WasteEur}}<span style="font-size:16px">€</span></div>
+      <div class="metric-label">Gaspillage estimé/an</div>
+    </div>
+    <div class="metric">
+      <div class="metric-value">{{.Pods}}</div>
+      <div class="metric-label">Pods analysés</div>
+    </div>
+  </div>
+
+  {{if .Recs}}
+  <h3 style="color:#0f3460">🎯 Top recommandations</h3>
+  {{range .Recs}}
+  <div class="reco {{.Priority}}">
+    <span class="priority {{.Priority}}">{{.Priority}}</span>
+    <strong style="margin-left:8px">{{.Title}}</strong>
+    {{if .SavingsEur}}<span style="float:right; color:#22c55e; font-weight:600">{{printf "+%.0f€/an" .SavingsEur}}</span>{{end}}
+    <div style="font-size:13px; color:#64748b; margin-top:4px">{{.Description}}</div>
+  </div>
+  {{end}}
+  {{end}}
+
+  <div class="footer">
+    Généré le {{.GeneratedAt}} — K8s Green Optimizer<br>
+    <a href="#" style="color:#0f3460">Voir le dashboard complet →</a>
+  </div>
+</body>
+</html>

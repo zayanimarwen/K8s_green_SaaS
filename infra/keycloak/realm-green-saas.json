@@ -1,0 +1,47 @@
+{
+  "realm": "green-saas",
+  "displayName": "K8s Green Optimizer",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "accessTokenLifespan": 300,
+  "clients": [
+    {
+      "clientId": "green-frontend",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "redirectUris": [
+        "http://localhost:3000/*",
+        "https://*.k8s-green.io/*"
+      ],
+      "webOrigins": [
+        "*"
+      ]
+    },
+    {
+      "clientId": "green-backend",
+      "publicClient": false,
+      "bearerOnly": true
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "superadmin"
+      },
+      {
+        "name": "admin"
+      },
+      {
+        "name": "viewer"
+      }
+    ]
+  },
+  "clientScopes": [
+    {
+      "name": "tenant_id",
+      "protocol": "openid-connect"
+    }
+  ]
+}

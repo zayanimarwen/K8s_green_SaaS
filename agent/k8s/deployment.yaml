@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: green-agent
+  namespace: green-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: green-agent
+  template:
+    metadata:
+      labels:
+        app: green-agent
+    spec:
+      serviceAccountName: green-agent-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+      containers:
+        - name: agent
+          image: ghcr.io/k8s-green/agent:latest
+          envFrom:
+            - configMapRef:
+                name: green-agent-config
+          env:
+            - name: GREEN_SIGNING_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: green-agent-secrets
+                  key: signing-key
+            - name: GREEN_NATS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: green-agent-secrets
+                  key: nats-url
+          volumeMounts:
+            - name: mtls-certs
+              mountPath: /certs
+              readOnly: true
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+      volumes:
+        - name: mtls-certs
+          secret:
+            secretName: green-agent-mtls

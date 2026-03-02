@@ -1,0 +1,128 @@
+version: "3.9"
+
+services:
+
+  # ─── Bases de données ───────────────────────────────────────────────
+  postgres:
+    image: timescale/timescaledb:latest-pg16
+    container_name: green-postgres
+    environment:
+      POSTGRES_USER: green
+      POSTGRES_PASSWORD: green_dev_password
+      POSTGRES_DB: green_saas
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U green"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: green-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+
+  # ─── NATS JetStream ─────────────────────────────────────────────────
+  nats:
+    image: nats:2.10-alpine
+    container_name: green-nats
+    ports:
+      - "4222:4222"   # Client
+      - "8222:8222"   # HTTP monitoring
+    command: "-js -m 8222"
+
+  # ─── Backend API ─────────────────────────────────────────────────────
+  api:
+    build:
+      context: ./backend
+      target: dev
+    container_name: green-api
+    environment:
+      ENV: development
+      PORT: "9000"
+      DATABASE_URL: postgres://green:green_dev_password@postgres:5432/green_saas?sslmode=disable
+      REDIS_URL: redis://redis:6379
+      NATS_URL: nats://nats:4222
+      LOG_LEVEL: debug
+      SIGNING_KEY: dev-signing-key-minimum-32-chars-ok
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      nats:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Backend Worker ──────────────────────────────────────────────────
+  worker:
+    build:
+      context: ./backend
+      target: dev
+    container_name: green-worker
+    environment:
+      ENV: development
+      DATABASE_URL: postgres://green:green_dev_password@postgres:5432/green_saas?sslmode=disable
+      REDIS_URL: redis://redis:6379
+      NATS_URL: nats://nats:4222
+      LOG_LEVEL: debug
+      SIGNING_KEY: dev-signing-key-minimum-32-chars-ok
+      DEFAULT_COST_CPU_H: "0.05"
+      DEFAULT_COST_MEM_H: "0.006"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - postgres
+      - nats
+
+  # ─── Frontend ────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      target: dev
+    container_name: green-frontend
+    environment:
+      VITE_API_URL: http://localhost:9000
+      VITE_WS_URL: ws://localhost:9000
+      VITE_KEYCLOAK_URL: http://localhost:8080
+      VITE_KEYCLOAK_REALM: green-saas
+      VITE_KEYCLOAK_CLIENT_ID: green-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - api
+
+  # ─── Keycloak (dev) ──────────────────────────────────────────────────
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: green-keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin123
+      KC_DB: dev-mem
+    ports:
+      - "8080:8080"
+    command: start-dev
+    profiles: ["auth"]  # Lancer avec: docker compose --profile auth up
+
+volumes:
+  postgres-data:
+  redis-data:

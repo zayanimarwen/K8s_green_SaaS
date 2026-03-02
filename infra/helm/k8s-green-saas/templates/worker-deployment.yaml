@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: green-worker
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: green-worker
+spec:
+  replicas: {{ .Values.worker.replicas }}
+  selector:
+    matchLabels:
+      app: green-worker
+  template:
+    metadata:
+      labels:
+        app: green-worker
+    spec:
+      containers:
+        - name: worker
+          image: "{{ .Values.global.image.registry }}/backend:{{ .Values.global.image.tag }}"
+          args: ["./worker"]
+          envFrom:
+            - secretRef:
+                name: green-saas-secrets
+          resources:
+            {{- toYaml .Values.worker.resources | nindent 12 }}

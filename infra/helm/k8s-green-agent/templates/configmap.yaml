@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "k8s-green-agent.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+data:
+  GREEN_CLUSTER_ID: {{ .Values.config.clusterId | quote }}
+  GREEN_TENANT_ID: {{ .Values.config.tenantId | quote }}
+  GREEN_COLLECT_INTERVAL: {{ .Values.config.collectInterval | quote }}
+  GREEN_PROMETHEUS_URL: {{ .Values.config.prometheusUrl | quote }}
+  GREEN_LOG_LEVEL: {{ .Values.config.logLevel | quote }}
+  GREEN_INCLUDE_SYSTEM_NS: {{ .Values.config.includeSystemNs | quote }}
+  GREEN_TLS_CERT_FILE: "/certs/tls.crt"
+  GREEN_TLS_KEY_FILE:  "/certs/tls.key"
+  GREEN_TLS_CA_FILE:   "/certs/ca.crt"
