@@ -19,7 +19,7 @@ const adminItems = [
   { path: '/admin/users',   label: 'Users',   icon: 'U' },
 ]
 
-export default function Sidebar() {
+export function Sidebar() {
   const { user } = useAuthStore()
   const isSuperAdmin = user?.roles?.includes('superadmin')
 

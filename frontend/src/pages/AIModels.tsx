@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { apiClient } from '../lib/api'
-import PageLayout from '../components/layout/PageLayout'
+import apiClient from '../lib/api'
+import { PageLayout } from '../components/layout/PageLayout'
 
 interface ModelInfo {
   name: string
@@ -31,7 +31,7 @@ const MODEL_COLORS: Record<string, string> = {
   'gemma2:2b':   'bg-pink-50 border-pink-200',
 }
 
-export default function AIModels() {
+export function AIModels() {
   const qc = useQueryClient()
   const [pulling, setPulling] = useState<string | null>(null)
 

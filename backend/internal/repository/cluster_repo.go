@@ -12,7 +12,9 @@ type ClusterRepo struct{ db *Postgres }
 
 func (r *ClusterRepo) ListByTenant(ctx context.Context, tenantID string) ([]domain.Cluster, error) {
 	rows, err := r.db.Pool.Query(ctx,
-		`SELECT id, name, provider, region, environment, k8s_version, agent_version, last_seen_at, created_at, active
+		`SELECT id, name, provider, region, environment,
+		        COALESCE(k8s_version, ''), COALESCE(agent_version, ''),
+		        last_seen_at, created_at, active
 		 FROM clusters WHERE active = true ORDER BY name`,
 	)
 	if err != nil {
@@ -23,9 +25,13 @@ func (r *ClusterRepo) ListByTenant(ctx context.Context, tenantID string) ([]doma
 	var clusters []domain.Cluster
 	for rows.Next() {
 		var c domain.Cluster
+		var lastSeen *time.Time
 		if err := rows.Scan(&c.ID, &c.Name, &c.Provider, &c.Region, &c.Environment,
-			&c.K8sVersion, &c.AgentVersion, &c.LastSeenAt, &c.CreatedAt, &c.Active); err != nil {
+			&c.K8sVersion, &c.AgentVersion, &lastSeen, &c.CreatedAt, &c.Active); err != nil {
 			continue
+		}
+		if lastSeen != nil {
+			c.LastSeenAt = lastSeen
 		}
 		c.TenantID = tenantID
 		clusters = append(clusters, c)

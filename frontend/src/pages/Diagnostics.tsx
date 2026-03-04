@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
-import { apiClient } from '../lib/api'
+import apiClient from '../lib/api'
 import { useClusterStore } from '../store/clusterStore'
-import PageLayout from '../components/layout/PageLayout'
-import MetricCard from '../components/ui/MetricCard'
+import { PageLayout } from '../components/layout/PageLayout'
+import { MetricCard } from '../components/ui/MetricCard'
 
 interface Issue {
   id: string
@@ -48,7 +48,7 @@ const healthColor = (score: number) => {
   return 'text-red-600'
 }
 
-export default function Diagnostics() {
+export function Diagnostics() {
   const { selectedCluster } = useClusterStore()
   const [expandedIssue, setExpandedIssue] = useState<string | null>(null)
   const [aiAnalysis, setAiAnalysis] = useState<Record<string, string>>({})

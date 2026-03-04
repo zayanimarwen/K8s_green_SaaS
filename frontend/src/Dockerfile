@@ -4,6 +4,8 @@ WORKDIR /app
 COPY package.json ./
 RUN npm install --legacy-peer-deps
 COPY . .
+# Vite attend index.html a la racine
+RUN cp public/index.html . 2>/dev/null || true
 RUN npm run build
 
 # Production stage (nginx)
@@ -19,5 +21,6 @@ WORKDIR /app
 COPY package.json ./
 RUN npm install --legacy-peer-deps
 COPY . .
+RUN cp public/index.html . 2>/dev/null || true
 EXPOSE 3000
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
