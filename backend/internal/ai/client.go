@@ -46,25 +46,13 @@ func NewClient(cfg Config) (LLMClient, error) {
 
 		// Verifier disponibilite et auto-pull si necessaire
 		ctx := context.Background()
-		ok, models := client.IsAvailable(ctx)
+		ok := client.IsAvailable(ctx)
 		if !ok {
-			log.Warn().Str("url", url).Msg("Ollama non joignable ??? diagnostics IA desactives")
+			log.Warn().Str("url", url).Msg("Ollama non joignable - diagnostics IA desactives")
 			return nil, fmt.Errorf("ollama non joignable sur %s", url)
 		}
-
-		// Verifier si le modele est deja pull
-		modelFound := false
-		for _, m := range models {
-			if m == model || m == model+":latest" {
-				modelFound = true
-				break
-			}
-		}
-		if !modelFound {
-			log.Info().Str("model", model).Msg("Modele absent ??? pull en cours...")
-			if err := client.PullModel(ctx); err != nil {
-				return nil, fmt.Errorf("impossible de pull %s: %w", model, err)
-			}
+		if err := client.PullModel(ctx, model); err != nil {
+			log.Warn().Err(err).Str("model", model).Msg("Pull modele echoue")
 		}
 
 		log.Info().Str("model", model).Str("url", url).Msg("Ollama pret")

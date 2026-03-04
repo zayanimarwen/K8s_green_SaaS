@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: green-agent-sa
+  namespace: green-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: green-agent-readonly
+rules:
+  - apiGroups: [""]
+    resources: [pods, nodes, namespaces, resourcequotas, limitranges, events]
+    verbs: [get, list, watch]
+  - apiGroups: [apps]
+    resources: [deployments, replicasets, daemonsets, statefulsets]
+    verbs: [get, list, watch]
+  - apiGroups: [autoscaling]
+    resources: [horizontalpodautoscalers]
+    verbs: [get, list, watch]
+  - apiGroups: [metrics.k8s.io]
+    resources: [nodes, pods]
+    verbs: [get, list]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: green-agent-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: green-agent-readonly
+subjects:
+  - kind: ServiceAccount
+    name: green-agent-sa
+    namespace: green-system
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: green-agent
+  namespace: green-system
+  labels:
+    app: green-agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: green-agent
+  template:
+    metadata:
+      labels:
+        app: green-agent
+    spec:
+      serviceAccountName: green-agent-sa
+      containers:
+        - name: agent
+          image: local/agent:1.0.0
+          imagePullPolicy: Never
+          env:
+            - name: GREEN_CLUSTER_ID
+              value: "eb3f8f3b-202f-4ac9-a80a-530a925338cc"
+            - name: GREEN_TENANT_ID
+              value: "tenant-demo"
+            - name: GREEN_SAAS_URL
+              value: "http://green-api:9000"
+            - name: GREEN_NATS_URL
+              value: "nats://nats:4222"
+            - name: GREEN_SIGNING_KEY
+              value: "green-signing-key-minimum-32-chars-ok"
+            - name: GREEN_COLLECT_INTERVAL
+              value: "30s"
+            - name: GREEN_LOG_LEVEL
+              value: "info"
+            - name: ENV
+              value: "development"
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
