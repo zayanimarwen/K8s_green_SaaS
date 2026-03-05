@@ -3,8 +3,8 @@ import { useAuthStore } from '@/store/authStore'
 import { useTenantStore } from '@/store/tenantStore'
 
 const api: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/v1',
-  timeout: 30000,
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:9000/v1',
+  timeout: 60000,
 })
 
 // Injecter le token JWT et le tenant_id dans chaque requête

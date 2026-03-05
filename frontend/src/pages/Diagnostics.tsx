@@ -49,7 +49,7 @@ const healthColor = (score: number) => {
 }
 
 export function Diagnostics() {
-  const { selectedCluster } = useClusterStore()
+  const selectedCluster = useClusterStore(s => s.selectedClusterId) ?? 'eb3f8f3b-202f-4ac9-a80a-530a925338cc'
   const [expandedIssue, setExpandedIssue] = useState<string | null>(null)
   const [aiAnalysis, setAiAnalysis] = useState<Record<string, string>>({})
 

@@ -63,6 +63,10 @@ func NewRouter(cfg *config.Config, db *repository.Postgres, rdb *repository.Redi
 
 	v1.GET("/reports", h.GetReports)
 
+	// Endpoint interne pour l agent — auth par header X-Internal-Key
+	internal := r.Group("/internal")
+	internal.POST("/metrics", middleware.InternalKey(cfg), h.IngestMetrics)
+
 	ws := r.Group("/v1/ws", middleware.Auth(cfg), middleware.Tenant())
 	ws.GET("/clusters/:id/live", h.LiveWebSocket)
 
