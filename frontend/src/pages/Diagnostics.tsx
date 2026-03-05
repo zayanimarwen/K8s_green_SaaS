@@ -53,7 +53,7 @@ export function Diagnostics() {
   const [expandedIssue, setExpandedIssue] = useState<string | null>(null)
   const [aiAnalysis, setAiAnalysis] = useState<Record<string, string>>({})
 
-  const { data, isLoading, refetch } = useQuery<DiagnosticsResult>({
+  const { data, isLoading, isFetching, refetch } = useQuery<DiagnosticsResult>({
     queryKey: ['diagnostics', selectedCluster],
     queryFn: () => apiClient.get(`/clusters/${selectedCluster}/diagnostics`).then(r => r.data),
     enabled: !!selectedCluster,
@@ -132,12 +132,12 @@ export function Diagnostics() {
           disabled={isLoading}
           className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
         >
-          {isLoading ? 'Analyse...' : 'Actualiser'}
+          {isFetching ? 'Analyse...' : 'Actualiser'}
         </button>
       </div>
 
       {/* Liste des issues */}
-      {isLoading ? (
+      {isLoading && !data ? (
         <div className="text-center py-16 text-slate-400">Analyse en cours...</div>
       ) : !data?.issues?.length ? (
         <div className="text-center py-16">
