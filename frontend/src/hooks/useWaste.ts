@@ -6,7 +6,7 @@ export function useWaste(clusterId: string) {
   return useQuery<WasteReport>({
     queryKey: ['waste', clusterId],
     queryFn: async () => {
-      const { data } = await api.get(`/v1/clusters/${clusterId}/waste`)
+      const { data } = await api.get(`/clusters/${clusterId}/waste`)
       return data
     },
     staleTime: 60_000,

@@ -6,7 +6,7 @@ export function useScore(clusterId: string) {
   return useQuery<GreenScore>({
     queryKey: ['score', clusterId],
     queryFn: async () => {
-      const { data } = await api.get(`/v1/clusters/${clusterId}/score`)
+      const { data } = await api.get(`/clusters/${clusterId}/score`)
       return data
     },
     refetchInterval: 30_000,  // Refresh toutes les 30s en background
